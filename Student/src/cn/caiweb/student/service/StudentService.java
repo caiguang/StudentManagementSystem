@@ -4,6 +4,7 @@ import java.util.List;
 
 import cn.caiweb.student.dao.StudentDao;
 import cn.caiweb.student.model.Student;
+import cn.caiweb.student.util.PageInfo;
 
 public class StudentService {
 
@@ -38,5 +39,9 @@ public class StudentService {
 	
 	public Student getStudent(String id) {
 		return dao.getStudent(id);
+	}
+	
+	public PageInfo getStudents(List<Student> students, int pageNo, int pageCount) {
+		return dao.getStudents(students, pageNo, pageCount);
 	}
 }

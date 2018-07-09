@@ -1,13 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="cn.caiweb.student.model.*,cn.caiweb.student.service.*, java.util.*" %>
+<%@ page import="cn.caiweb.student.model.*,cn.caiweb.student.service.*, java.util.*, cn.caiweb.student.util.PageInfo" %>
 <%@ include file="../user/User_validate.jsp" %>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 %>
 <%
-List<Student> students = StudentService.getInstance().getStudents();
+String strNo = request.getParameter("pageNo");
+int pageNo = 1;
+if(strNo != null) {
+	pageNo = Integer.parseInt(strNo);
+}
+
+List<Student> students = new ArrayList<Student>();
+PageInfo pi = StudentService.getInstance().getStudents(students, pageNo, 3);
 %>
 <!DOCTYPE html>
 <html>
@@ -71,6 +78,9 @@ List<Student> students = StudentService.getInstance().getStudents();
 
 	<!-- 遍历结束 -->
 </table>
+共<%=pi.getTotalPage() %>页&nbsp;第<%=pi.getCurrentPage() %>页&nbsp;&nbsp;
+&nbsp;<a href="student/Student_query_success.jsp?pageNo=<%=pi.getPageUp()%>">上一页</a>
+&nbsp;<a href="student/Student_query_success.jsp?pageNo=<%=pi.getPageDown()%>">下一页</a>
 </div>
 </body>
 </html>

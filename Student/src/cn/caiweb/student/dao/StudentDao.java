@@ -11,6 +11,7 @@ import java.util.List;
 
 import cn.caiweb.student.model.Student;
 import cn.caiweb.student.util.DBUtil;
+import cn.caiweb.student.util.PageInfo;
 
 public class StudentDao {
 
@@ -161,6 +162,48 @@ public class StudentDao {
 			DBUtil.close(result, pstate, conn);
 		}
 		return s;
+	}
+	//拿到带有分页信息的student集合
+	public PageInfo getStudents(List<Student> students, int pageNo, int pageCount) {
+		PageInfo page = new PageInfo();
+		Connection conn = DBUtil.getConnection();
+		Statement state = null;
+		ResultSet result = null;
+		try {
+			state = conn.createStatement();
+			result = state.executeQuery("select count(*) from student");
+			result.next();
+			int count = result.getInt(1);
+			page.setTotalPage(count%pageCount == 0 ? count/pageCount : count/pageCount + 1); 
+			
+			if(pageNo < 1) {
+				pageNo = 1;
+			} else if(pageNo > page.getTotalPage()) {
+				pageNo = page.getTotalPage();
+			}
+			
+			int startPosition = pageNo * pageCount - pageCount;
+			page.setCurrentPage(pageNo);
+			
+			DBUtil.close(result);
+			
+			result = state.executeQuery("select * from student order by birthday desc limit " + startPosition + ", " + pageCount);
+			while(result.next()) {
+				String id = result.getString("id");
+				String name = result.getString("name");
+				String gender = result.getString("gender");
+				Date birthday = result.getDate("birthday");
+				String address = result.getString("address");
+				Student s = new Student(id, name, gender, birthday, address);
+				students.add(s);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(result, state, conn);
+		}
+		return page;
 	}
 
 }
